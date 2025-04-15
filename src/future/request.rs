@@ -3,6 +3,7 @@ mod untyped;
 
 use crate::internal_utils::SystemRepr;
 use internal_macros::{FutureFromPollUnpinned, StructNameDebug};
+pub use listeners::EventTargetResult;
 use listeners::Listeners;
 use sealed::sealed;
 use std::marker::PhantomData;
@@ -54,7 +55,7 @@ impl PollUnpinned for Request {
 
     fn poll_unpinned(&mut self, cx: &mut Context) -> Poll<Self::Output> {
         match self.inner.poll_unpinned(cx) {
-            Poll::Ready(Ok(())) => Poll::Ready(self.as_sys().result().map_err(Into::into)),
+            Poll::Ready(Ok(_)) => Poll::Ready(self.as_sys().result().map_err(Into::into)),
             Poll::Pending => Poll::Pending,
             Poll::Ready(Err(e)) => Poll::Ready(Err(e)),
         }
@@ -63,7 +64,7 @@ impl PollUnpinned for Request {
 
 #[sealed]
 impl PollUnpinned for Request<()> {
-    type Output = crate::Result<()>;
+    type Output = crate::Result<EventTargetResult>;
 
     #[inline]
     fn poll_unpinned(&mut self, cx: &mut Context) -> Poll<Self::Output> {

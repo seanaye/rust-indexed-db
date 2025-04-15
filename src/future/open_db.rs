@@ -71,7 +71,7 @@ impl OpenDbRequest {
 impl OpenDbRequest {
     fn phase_poll_req(&mut self, cx: &mut Context) -> Poll<crate::OpenDbResult<Database>> {
         match self.req.poll_unpinned(cx) {
-            Poll::Ready(Ok(())) => {
+            Poll::Ready(Ok(_)) => {
                 cfg_if! {
                     if #[cfg(feature = "async-upgrade")] {
                         self.polling_fn = Self::phase_poll_listeners;

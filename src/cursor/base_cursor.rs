@@ -1,5 +1,5 @@
 use super::{CursorDirection, CursorSys};
-use crate::future::{PollUnpinned, VoidRequest};
+use crate::future::{EventTargetResult, PollUnpinned, VoidRequest};
 use crate::internal_utils::SystemRepr;
 use crate::primitive::{TryFromJs, TryToJs};
 use fancy_constructor::new;
@@ -68,7 +68,7 @@ impl BaseCursor {
             Ok(())
         } else {
             self.as_sys().advance(step)?;
-            self.req().await
+            self.req().await.map(|_| ())
         }
     }
 
@@ -186,7 +186,7 @@ impl BaseCursor {
 
     fn on_req_polled<R, F>(
         &mut self,
-        poll: Poll<crate::Result<()>>,
+        poll: Poll<crate::Result<EventTargetResult>>,
         read_current: F,
     ) -> Poll<crate::Result<Option<R>>>
     where
@@ -197,7 +197,7 @@ impl BaseCursor {
                 self.state = CursorState::ReadCurrent;
 
                 Poll::Ready(match res {
-                    Ok(()) => {
+                    Ok(EventTargetResult::NotNull) => {
                         // Firefox implementation: key gets set to undefined on cursor end
                         if self.has_key() {
                             self.read_current(read_current)
@@ -205,6 +205,9 @@ impl BaseCursor {
                             Ok(None)
                         }
                     }
+                    // Chrome implementation: the only way to know if a cursor has finished
+                    // is by reading the value from onsuccess event.target.result
+                    Ok(EventTargetResult::Null) => Ok(None),
                     Err(e) => Err(e),
                 })
             }

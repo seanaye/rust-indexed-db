@@ -5,7 +5,7 @@ pub use basic::BasicRequest;
 pub use get_all::*;
 pub use maybe_errored::MaybeErrored;
 pub use open_db::{OpenDbListener, OpenDbRequest};
-pub use request::{Request, VoidRequest};
+pub use request::{EventTargetResult, Request, VoidRequest};
 pub use traits::*;
 
 mod array_map;

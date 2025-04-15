@@ -1,9 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
-  ".",
-  "internal_macros",
-]
+members = [".", "internal_macros"]
 
 [package]
 name = "indexed_db_futures"
@@ -16,11 +13,7 @@ description = "Future bindings for IndexedDB via web_sys"
 repository = "https://github.com/Alorel/rust-indexed-db"
 keywords = ["wasm", "indexeddb", "future", "webassembly", "idb"]
 categories = ["asynchronous", "database", "wasm", "web-programming"]
-include = [
-  "src/",
-  "Cargo.toml",
-  "README.md"
-]
+include = ["src/", "Cargo.toml", "README.md"]
 
 [features]
 async-upgrade = []
@@ -29,27 +22,16 @@ cursors = [
   "web-sys/IdbCursorWithValue",
   "web-sys/IdbCursorDirection",
 ]
-dates = [
-  "dep:web-time",
-  "_serialise-deserialise-dyn",
-]
-indices = [
-  "web-sys/IdbIndex",
-  "web-sys/IdbIndexParameters",
-]
-list-databases = [
-  "dep:impartial-ord",
-]
+dates = ["dep:web-time", "_serialise-deserialise-dyn"]
+indices = ["web-sys/IdbIndex", "web-sys/IdbIndexParameters"]
+list-databases = ["dep:impartial-ord"]
 serde = [
   "dep:serde",
   "dep:serde-wasm-bindgen",
   "smallvec/serde",
   "web-time/serde",
 ]
-streams = [
-  "dep:futures-core",
-  "wasm_evt_listener/streams",
-]
+streams = ["dep:futures-core", "wasm_evt_listener/streams"]
 switch = []
 tx-done = ["dep:wasm_evt_listener"]
 typed-arrays = []
@@ -96,7 +78,14 @@ syn = "2"
 accessory = { workspace = true }
 cfg-if = { workspace = true }
 delegate-display = { workspace = true }
-derive_more = { workspace = true, features = ["as_ref", "from", "deref", "deref_mut", "into", "debug"], default-features = false }
+derive_more = { workspace = true, features = [
+  "as_ref",
+  "from",
+  "deref",
+  "deref_mut",
+  "into",
+  "debug",
+], default-features = false }
 fancy_constructor = { workspace = true }
 futures-core = { workspace = true, optional = true }
 impartial-ord = { workspace = true, optional = true }
