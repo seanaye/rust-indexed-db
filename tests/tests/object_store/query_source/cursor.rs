@@ -379,6 +379,38 @@ pub mod cursor {
         }
 
         #[wasm_bindgen_test]
+        #[cfg(all(feature = "serde", feature = "streams", feature = "cursors"))]
+        pub async fn cursor_stream_one() {
+            use serde::{Deserialize, Serialize};
+            let db = random_db_keyval().await;
+            #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+            struct Foo {
+                a: String,
+                b: u32,
+                key: u32,
+            }
+            let data = Foo {
+                a: "hello".to_string(),
+                b: 42,
+                key: 1,
+            };
+            // seed db
+            {
+                open_tx!(db, Readwrite > (tx, store));
+
+                store.add(data.clone()).serde().unwrap().await.unwrap();
+                drop(store);
+                tx.commit().await.unwrap();
+            }
+            open_tx!(db, Readonly > (tx, store));
+            let cursor = store.open_cursor().serde().unwrap().await.unwrap().unwrap();
+            let res: Result<Vec<_>, _> = cursor.stream_ser::<Foo>().try_collect().await;
+            let res = res.unwrap();
+            assert_eq!(res.len(), 1);
+            assert_eq!(res.first().unwrap(), &data)
+        }
+
+        #[wasm_bindgen_test]
         pub async fn with_query() {
             let db = random_db_keyval().await;
             KeyVal::insert_keyval_docs(&db).await;
